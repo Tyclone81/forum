@@ -10,11 +10,11 @@ import (
 // SeedCategories guarantees the application has default categories available from moment one.
 func SeedCategories(ctx context.Context, db *sql.DB) error {
 	defaultCategories := []string{
-		"Golang",
-		"Docker",
-		"AI & Architecture",
-		"Vibe Coding",
-		"Viable Systems",
+		"Entertainment",
+		"Sports",
+		"Politics",
+		"Technology",
+		"Others",
 	}
 
 	query := `INSERT OR IGNORE INTO categories (name) VALUES (?);`
@@ -30,6 +30,9 @@ func SeedCategories(ctx context.Context, db *sql.DB) error {
 		if err != nil {
 			return fmt.Errorf("failed seeding category item (%s): %w", name, err)
 		}
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM categories WHERE name NOT IN ('Entertainment', 'Sports', 'Politics', 'Technology', 'Others')`); err != nil {
+		return fmt.Errorf("failed removing legacy categories: %w", err)
 	}
 
 	return tx.Commit()
@@ -59,10 +62,10 @@ func SeedMockData(ctx context.Context, db *sql.DB) error {
 		return fmt.Errorf("failed to seed structural mock post: %w", err)
 	}
 
-	// 3. Connect the post to the 'Viable Systems' category tag index cleanly
+	// 3. Connect the post to the 'Technology' category tag index cleanly
 	junctionQuery := `INSERT OR IGNORE INTO post_categories (post_id, category_id) 
 	                  SELECT ?, id FROM categories WHERE name = ?;`
-	_, err = db.ExecContext(ctx, junctionQuery, mockPostID, "Viable Systems")
+	_, err = db.ExecContext(ctx, junctionQuery, mockPostID, "Technology")
 	if err != nil {
 		return fmt.Errorf("failed to link structural category associations: %w", err)
 	}

@@ -18,5 +18,5 @@ type Post struct {
 // Category represents a distinct system subforum topic tag.
 type Category struct {
 	ID   int    `json:"id"`
-	Name string `json:"name"` // e.g., "Golang", "Docker", "AI"
+	Name string `json:"name"` // e.g., "Technology", "Sports", "Others"
 }

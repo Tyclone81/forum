@@ -2,16 +2,22 @@ package service
 
 import (
 	"context"
+	"errors"
 	"forum/internal/models"
 	"forum/internal/repository"
 )
 
 type FilterService struct {
-	postRepo *repository.PostRepository
+	postRepo        *repository.PostRepository
+	interactionRepo *repository.InteractionRepository
 }
 
-func NewFilterService(repo *repository.PostRepository) *FilterService {
-	return &FilterService{postRepo: repo}
+func NewFilterService(repo *repository.PostRepository, interactionRepos ...*repository.InteractionRepository) *FilterService {
+	service := &FilterService{postRepo: repo}
+	if len(interactionRepos) > 0 {
+		service.interactionRepo = interactionRepos[0]
+	}
+	return service
 }
 
 // FilterByCategory returns posts containing a specific target subforum topic string.
@@ -50,27 +56,24 @@ func (s *FilterService) FilterByCreated(ctx context.Context, userID string) ([]*
 }
 
 // FilterByLiked filters posts that the target user evaluated with an active upvote interaction.
-func (s *FilterService) FilterByLiked(ctx context.Context, userID string, dbRepo *repository.PostRepository) ([]*models.Post, error) {
-	// Re-uses explicit query mapping logic or scans calculated memory structures cleanly
+func (s *FilterService) FilterByLiked(ctx context.Context, userID string) ([]*models.Post, error) {
+	if s.interactionRepo == nil {
+		return nil, errors.New("interaction repository is not configured")
+	}
 	allPosts, err := s.postRepo.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Evaluates matching relationships using structural metrics.
-	// For production execution efficiency, the filter maps parameters using clean evaluations.
 	var filtered []*models.Post
 	for _, post := range allPosts {
-		// A helper query call can check if an upvote relationship match exists for the target post
-		if s.hasUserLikedPost(ctx, userID, post.ID, dbRepo) {
+		liked, err := s.interactionRepo.HasLikedPost(ctx, userID, post.ID)
+		if err != nil {
+			return nil, err
+		}
+		if liked {
 			filtered = append(filtered, post)
 		}
 	}
 	return filtered, nil
-}
-
-// Small functional checker resolving voter metrics safely
-func (s *FilterService) hasUserLikedPost(ctx context.Context, userID, postID string, dbRepo *repository.PostRepository) bool {
-	// Maps internal interactions validation logic check statements
-	return false // Bound cleanly until interaction repository bindings execute
 }

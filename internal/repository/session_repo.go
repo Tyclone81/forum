@@ -41,3 +41,8 @@ func (r *SessionRepository) Delete(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx, query, id)
 	return err
 }
+
+func (r *SessionRepository) DeleteByUserID(ctx context.Context, userID string) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM sessions WHERE user_id = ?`, userID)
+	return err
+}

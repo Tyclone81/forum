@@ -1,0 +1,17 @@
+services:
+  web-forum:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - forum-data:/app/data
+    environment:
+      - DB_PATH=/app/data/forum.db
+      - SCHEMA_PATH=/app/internal/database/schema.sql
+    restart: unless-stopped
+
+volumes:
+  forum-data:
+    driver: local

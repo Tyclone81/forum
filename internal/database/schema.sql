@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS posts (
 -- 4. CATEGORIES TABLE
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE            -- e.g., 'Golang', 'Docker', 'AI Tools'
+    name TEXT NOT NULL UNIQUE            -- e.g., 'Technology', 'Sports', 'Others'
 );
 
 -- 5. POST_CATEGORIES JAVASCRIPT/RELATION TABLE (Many-to-Many Bridge)
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS interactions (
     id TEXT PRIMARY KEY,                 -- UUID
     user_id TEXT NOT NULL,               -- Voter
     target_id TEXT NOT NULL,             -- Refers to either a Post ID or a Comment ID
-    target_type TEXT NOT NULL,           -- Must be either 'post' or 'comment'
-    value INTEGER NOT NULL,              -- 1 for Like, -1 for Dislike
+    target_type TEXT NOT NULL CHECK (target_type IN ('post', 'comment')), -- Reaction target kind
+    value INTEGER NOT NULL CHECK (value IN (1, -1)), -- 1 for Like, -1 for Dislike
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, target_id, target_type), -- Prevents double-liking or double-disliking
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

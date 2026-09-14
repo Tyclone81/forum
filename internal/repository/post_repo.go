@@ -42,6 +42,50 @@ func (r *PostRepository) Create(ctx context.Context, post *models.Post) error {
 	return tx.Commit()
 }
 
+func (r *PostRepository) Update(ctx context.Context, postID, userID, title, content string, categories []string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	result, err := tx.ExecContext(ctx, `UPDATE posts SET title = ?, content = ? WHERE id = ? AND user_id = ?`, title, content, postID, userID)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM post_categories WHERE post_id = ?`, postID); err != nil {
+		return err
+	}
+	for _, categoryName := range categories {
+		if _, err := tx.ExecContext(ctx, `INSERT OR IGNORE INTO post_categories (post_id, category_id) SELECT ?, id FROM categories WHERE name = ?`, postID, categoryName); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func (r *PostRepository) Delete(ctx context.Context, postID, userID string) error {
+	result, err := r.db.ExecContext(ctx, `DELETE FROM posts WHERE id = ? AND user_id = ?`, postID, userID)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
 // GetAll fetches baseline threads decorated with computed likes/dislikes metrics.
 func (r *PostRepository) GetAll(ctx context.Context) ([]*models.Post, error) {
 	query := `
@@ -56,7 +100,6 @@ func (r *PostRepository) GetAll(ctx context.Context) ([]*models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	var posts []*models.Post
 	for rows.Next() {
@@ -66,9 +109,18 @@ func (r *PostRepository) GetAll(ctx context.Context) ([]*models.Post, error) {
 			return nil, err
 		}
 
-		// Hydrate individual category tag strings slice
-		p.Categories, _ = r.GetCategoriesByPostID(ctx, p.ID)
 		posts = append(posts, &p)
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, err
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+
+	for _, post := range posts {
+		post.Categories, _ = r.GetCategoriesByPostID(ctx, post.ID)
 	}
 	return posts, nil
 }

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    {{template "navbar" .}}
+
+    <main class="forum-container">
+
+        <!-- ===================== Left sidebar ===================== -->
+        <aside class="left-sidebar">
+            <section class="sidebar-section">
+                <h2>Categories</h2>
+                <ul class="category-list" id="category-list">
+                    <li><button class="category-button active" data-category="all">All</button></li>
+                    <li><button class="category-button" data-category="entertainment">Entertainment</button></li>
+                    <li><button class="category-button" data-category="sports">Sports</button></li>
+                    <li><button class="category-button" data-category="politics">Politics</button></li>
+                    <li><button class="category-button" data-category="technology">Technology</button></li>
+                    <li><button class="category-button" data-category="others">Others</button></li>
+                </ul>
+            </section>
+
+            <section class="sidebar-section">
+                <h2>Forum</h2>
+                <ul class="sidebar-link">
+                    <li><a href="/" class="active" data-nav="home">Latest Discussions</a></li>
+                    <li><a href="/activity/" data-tab-link="myposts">My Posts</a></li>
+                    <li><a href="/activity/" data-tab-link="liked">Liked Posts</a></li>
+                </ul>
+            </section>
+        </aside>
+
+        <!-- ===================== Feed ===================== -->
+        <section class="forum-feed">
+
+            <div id="guest-banner-slot"></div>
+
+            <div class="feed-header">
+                <div>
+                    <h1>Discussions</h1>
+                    <p>Join the conversation and share your ideas.</p>
+                </div>
+                <button id="create-post-button" class="primary-button">+ Create Post</button>
+            </div>
+
+            <!-- ===================== Create post form ===================== -->
+            <section class="create-post-card hidden" id="create-post-section">
+                <div class="create-post-header">
+                    <h2 id="create-post-title">Create a post</h2>
+                    <button type="button" id="cancel-post-button" class="close-button" aria-label="Close">&times;</button>
+                </div>
+
+                <p class="form-error" id="create-post-error"></p>
+
+                <form id="create-post-form">
+                    <input type="hidden" id="post-edit-id" value="">
+
+                    <div class="form-group">
+                        <label for="post-title">Title</label>
+                        <input type="text" id="post-title" name="title" placeholder="Give your post a title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categories</label>
+                        <div class="category-options" id="category-options">
+                            <!-- Checkboxes injected by app.js so they always match the sidebar category list -->
+                        </div>
+
+                        <div class="custom-category">
+                            <button type="button" id="show-category-button" class="secondary-button">+ Create new category</button>
+                            <div id="custom-category-form" class="custom-category-form hidden">
+                                <input type="text" id="custom-category-input" placeholder="Enter category name">
+                                <button type="button" id="add-category-button" class="secondary-button">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="post-content">Content</label>
+                        <textarea id="post-content" name="content" rows="6" placeholder="Share your thoughts..." required></textarea>
+                    </div>
+
+                    <div class="media-upload">
+                        <label for="post-images" class="media-button">Add images</label>
+                        <input type="file" id="post-images" name="images" accept="image/*" multiple hidden>
+
+                        <label for="post-video" class="media-button">Add video</label>
+                        <input type="file" id="post-video" name="video" accept="video/*" hidden>
+                    </div>
+
+                    <div id="media-preview" class="media-preview"></div>
+
+                    <div class="post-form-actions">
+                        <button type="button" id="cancel-post-button-bottom" class="secondary-button">Cancel</button>
+                        <button type="submit" class="primary-button" id="submit-post-button">Create post</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ===================== Feed tabs ===================== -->
+            <div class="feed-tabs" id="feed-tabs">
+                <button class="feed-tab active" data-sort="new">New</button>
+                <button class="feed-tab" data-sort="top">Top</button>
+            </div>
+
+            <!-- ===================== Posts ===================== -->
+            <div id="posts-container">
+                <!-- Post cards rendered here by app.js -->
+            </div>
+        </section>
+
+        <!-- ===================== Right sidebar ===================== -->
+        <aside class="right-sidebar">
+            <section class="sidebar-card">
+                <h2>Community</h2>
+                <p>A place for registered and guest members alike to post, comment and vote on discussions across every category.</p>
+            </section>
+
+            <section class="sidebar-card">
+                <h2>Forum Stats</h2>
+                <div class="stat">
+                    <strong id="user-count">0</strong>
+                    <span>Members</span>
+                </div>
+            </section>
+
+            <section class="sidebar-card">
+                <h2>Community Rules</h2>
+                <p>Be respectful. No spam. Keep posts in the right category. Edits and deletions are limited to your own posts and comments.</p>
+            </section>
+        </aside>
+
+    </main>
+
+    <script src="/js/store.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

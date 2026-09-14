@@ -85,6 +85,9 @@ func (s *AuthService) Login(ctx context.Context, email, password string, session
 		ExpiresAt: time.Now().Add(sessionDuration),
 	}
 
+	if err := s.sessionRepo.DeleteByUserID(ctx, user.ID); err != nil {
+		return nil, fmt.Errorf("failed clearing previous user sessions: %w", err)
+	}
 	if err := s.sessionRepo.Create(ctx, newSession); err != nil {
 		return nil, fmt.Errorf("failed saving user session reference metadata: %w", err)
 	}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Forum</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <main class="auth-page">
+        <section class="auth-card">
+            <div class="auth-brand">Forum</div>
+
+            <h1>Create your account</h1>
+            <p class="auth-subtitle">Join the conversation.</p>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+                </div>
+
+                <p id="register-error" class="form-error"></p>
+
+                <button type="submit" class="auth-button">Register</button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="/login/">Log in</a>
+            </p>
+        </section>
+    </main>
+
+    <script src="/js/store.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

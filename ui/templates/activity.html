@@ -1,0 +1,41 @@
+{{define "content"}}
+<main class="forum-container" style="grid-template-columns: 220px minmax(0,1fr);">
+    <aside class="left-sidebar">
+        <section class="sidebar-section">
+            <h2>Forum</h2>
+            <ul class="sidebar-link">
+                <li><a href="/">Latest Discussions</a></li>
+                <li><a href="/activity/?tab=myposts" class="active">My Posts</a></li>
+                <li><a href="/activity/?tab=liked">Liked Posts</a></li>
+            </ul>
+        </section>
+    </aside>
+
+    <section class="forum-feed">
+        <div class="activity-header">
+            <h1>My Activity</h1>
+            <p>Your posts and reactions, connected to the forum database.</p>
+        </div>
+        <nav class="activity-tabs" aria-label="Activity views">
+            <a class="activity-tab {{if eq .ActiveTab "myposts"}}active{{end}}" href="/activity/?tab=myposts">My Posts</a>
+            <a class="activity-tab {{if eq .ActiveTab "liked"}}active{{end}}" href="/activity/?tab=liked">Liked Posts</a>
+        </nav>
+        <div class="activity-panel">
+            {{if .Posts}}
+                {{range .Posts}}
+                <article class="post-card">
+                    <div class="post-body">
+                        <div class="post-meta"><span>By @{{.Username}}</span><span>{{.CreatedAt.Format "Jan 02, 2006"}}</span>{{range .Categories}}<span class="post-category-tag">{{.}}</span>{{end}}</div>
+                        <h2 class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></h2>
+                        <p class="post-content">{{.Content}}</p>
+                        <div class="post-actions"><a class="action-btn" href="/post/view?id={{.ID}}">&#128172; View discussion</a></div>
+                    </div>
+                </article>
+                {{end}}
+            {{else}}
+                <div class="empty-state"><p>No posts in this activity view yet.</p></div>
+            {{end}}
+        </div>
+    </section>
+</main>
+{{end}}

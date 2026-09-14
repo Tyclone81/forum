@@ -1,0 +1,55 @@
+{{define "content"}}
+<div class="detail-container">
+    <!-- Deep parent thread segment block -->
+    <article class="post-master-card">
+        <h1>{{.Post.Title}}</h1>
+        <div class="meta-strip">By @{{.Post.Username}} on {{.Post.CreatedAt.Format "Jan 02, 2006"}}</div>
+        <div class="master-content">{{.Post.Content}}</div>
+        <div class="post-reaction-bar" aria-label="Post actions">
+            <a class="icon-action comment-action" href="#comments" aria-label="View comments" title="View comments"><span aria-hidden="true">&#128172;</span><span class="reaction-count">{{len .Comments}}</span></a>
+            <button class="icon-action reaction-btn" type="button" data-target-id="{{.Post.ID}}" data-target-type="post" data-value="1" aria-label="Like post" title="Like post"><span aria-hidden="true">&#128077;</span><span class="reaction-count">{{.Post.Likes}}</span></button>
+            <button class="icon-action reaction-btn" type="button" data-target-id="{{.Post.ID}}" data-target-type="post" data-value="-1" aria-label="Dislike post" title="Dislike post"><span aria-hidden="true">&#128078;</span><span class="reaction-count">{{.Post.Dislikes}}</span></button>
+            <span class="interaction-error" role="status" aria-live="polite"></span>
+        </div>
+        {{if eq .Post.UserID .CurrentUserID}}
+        <details class="post-owner-tools"><summary>Edit or delete</summary><form action="/post/edit" method="POST" class="post-edit-form"><input type="hidden" name="post_id" value="{{.Post.ID}}"><label>Title<input type="text" name="title" value="{{.Post.Title}}" required></label><label>Content<textarea name="content" required>{{.Post.Content}}</textarea></label><fieldset><legend>Categories</legend>{{range .Post.Categories}}<label><input type="checkbox" name="categories" value="{{.}}" checked>{{.}}</label>{{end}}</fieldset><button class="secondary-button" type="submit">Save changes</button></form><form action="/post/delete" method="POST" class="post-delete-form" onsubmit="return confirm('Delete this post?');"><input type="hidden" name="post_id" value="{{.Post.ID}}"><button class="action-btn danger" type="submit">Delete post</button></form></details>
+        {{end}}
+    </article>
+
+    <!-- Discussion feed commentary timeline segment -->
+    <section class="comment-section" id="comments">
+        <h3>Discussion Threads ({{len .Comments}})</h3>
+
+        {{if .Comments}}
+            <div class="comments-timeline">
+                {{range .Comments}}
+                <div class="comment-bubble">
+                    <div class="comment-meta">@{{.Username}} • {{.CreatedAt.Format "15:04"}}</div>
+                    <p>{{.Content}}</p>
+                    <div class="comment-reactions">
+                        <button class="icon-action reaction-btn" type="button" data-target-id="{{.ID}}" data-target-type="comment" data-value="1" aria-label="Like comment" title="Like comment"><span aria-hidden="true">&#128077;</span><span class="reaction-count">{{.Likes}}</span></button>
+                        <button class="icon-action reaction-btn" type="button" data-target-id="{{.ID}}" data-target-type="comment" data-value="-1" aria-label="Dislike comment" title="Dislike comment"><span aria-hidden="true">&#128078;</span><span class="reaction-count">{{.Dislikes}}</span></button>
+                        <span class="interaction-error" role="status" aria-live="polite"></span>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        {{else}}
+            <p class="muted">No commentary strings attached to this blueprint yet.</p>
+        {{end}}
+
+        <!-- Conditional form processing block based on verification state guidelines -->
+        {{if .IsLoggedIn}}
+            <form action="/comment/create" method="POST" class="comment-input-form">
+                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                <textarea name="content" placeholder="Add engineering critique context parameters..." required></textarea>
+                <button type="submit" class="btn primary">Push Response</button>
+            </form>
+        {{else}}
+            <div class="callout">
+                <p class="interaction-error" role="status">You must be logged in to comment. You can continue reading, or <a href="/login">log in</a> when you are ready.</p>
+            </div>
+        {{end}}
+    </section>
+</div>
+{{end}}

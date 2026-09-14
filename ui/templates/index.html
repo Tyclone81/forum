@@ -1,0 +1,75 @@
+{{define "content"}}
+<main class="forum-container">
+    <aside class="left-sidebar">
+        <section class="sidebar-section">
+            <h2>Categories</h2>
+            <ul class="category-list">
+                <li><a class="category-button active" href="/">All</a></li>
+                <li><a class="category-button" href="/?category=Entertainment">Entertainment</a></li>
+                <li><a class="category-button" href="/?category=Sports">Sports</a></li>
+                <li><a class="category-button" href="/?category=Politics">Politics</a></li>
+                <li><a class="category-button" href="/?category=Technology">Technology</a></li>
+                <li><a class="category-button" href="/?category=Others">Others</a></li>
+            </ul>
+        </section>
+        <section class="sidebar-section">
+            <h2>Forum</h2>
+            <ul class="sidebar-link">
+                <li><a href="/" class="active">Latest Discussions</a></li>
+                {{if .IsLoggedIn}}<li><a href="/?filter=created">My Posts</a></li><li><a href="/?filter=liked">Liked Posts</a></li>{{end}}
+            </ul>
+        </section>
+    </aside>
+
+    <section class="forum-feed">
+        {{if not .IsLoggedIn}}<div class="guest-banner">You can browse as a guest. <a href="/login">Log in</a> to post, comment, or vote.</div>{{end}}
+        <div class="feed-header">
+            <div><h1>Discussions</h1><p>Join the conversation and share your ideas.</p></div>
+            {{if .IsLoggedIn}}<a href="#create-post-section" class="primary-button">+ Create Post</a>{{end}}
+        </div>
+
+        {{if .IsLoggedIn}}
+        <section class="create-post-card" id="create-post-section">
+            <div class="create-post-header"><h2>Create a post</h2></div>
+            <form id="create-post-form" action="/post/create" method="POST">
+                <div class="form-group"><label for="post-title">Title</label><input type="text" id="post-title" name="title" required></div>
+                <div class="form-group"><label>Categories</label><div class="category-options">
+                    <label><input class="category-checkbox" type="checkbox" name="categories" value="Entertainment"> Entertainment</label>
+                    <label><input class="category-checkbox" type="checkbox" name="categories" value="Sports"> Sports</label>
+                    <label><input class="category-checkbox" type="checkbox" name="categories" value="Politics"> Politics</label>
+                    <label><input class="category-checkbox" type="checkbox" name="categories" value="Technology"> Technology</label>
+                    <label><input class="category-checkbox" type="checkbox" name="categories" value="Others"> Others</label>
+                </div></div>
+                <div class="form-group"><label for="post-content">Content</label><textarea id="post-content" name="content" rows="6" required></textarea></div>
+                <div class="post-form-actions"><button type="submit" class="primary-button">Create post</button></div>
+            </form>
+        </section>
+        {{end}}
+
+        <div id="posts-container">
+        {{if .Posts}}
+            {{range .Posts}}
+            <article class="post-card">
+                <div class="post-body"><div class="post-meta"><span>By @{{.Username}}</span><span>{{.CreatedAt.Format "Jan 02, 2006"}}</span>{{range .Categories}}<span class="post-category-tag">{{.}}</span>{{end}}</div>
+                <h2 class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></h2><p class="post-content">{{.Content}}</p>
+                <div class="post-reaction-bar" aria-label="Post actions">
+                    <a class="icon-action comment-action" href="/post/view?id={{.ID}}" aria-label="View comments" title="View comments"><span aria-hidden="true">&#128172;</span></a>
+                    <button class="icon-action reaction-btn" type="button" data-target-id="{{.ID}}" data-target-type="post" data-value="1" aria-label="Like post" title="Like post"><span aria-hidden="true">&#128077;</span><span class="reaction-count">{{.Likes}}</span></button>
+                    <button class="icon-action reaction-btn" type="button" data-target-id="{{.ID}}" data-target-type="post" data-value="-1" aria-label="Dislike post" title="Dislike post"><span aria-hidden="true">&#128078;</span><span class="reaction-count">{{.Dislikes}}</span></button>
+                    <span class="interaction-error" role="status" aria-live="polite"></span>
+                </div></div>
+                {{if eq .UserID $.CurrentUserID}}
+                <details class="post-owner-tools"><summary>Edit or delete</summary><form action="/post/edit" method="POST" class="post-edit-form"><input type="hidden" name="post_id" value="{{.ID}}"><label>Title<input type="text" name="title" value="{{.Title}}" required></label><label>Content<textarea name="content" required>{{.Content}}</textarea></label><fieldset><legend>Categories</legend>{{range .Categories}}<label><input type="checkbox" name="categories" value="{{.}}" checked>{{.}}</label>{{end}}</fieldset><button class="secondary-button" type="submit">Save changes</button></form><form action="/post/delete" method="POST" class="post-delete-form" onsubmit="return confirm('Delete this post?');"><input type="hidden" name="post_id" value="{{.ID}}"><button class="action-btn danger" type="submit">Delete post</button></form></details>
+                {{end}}
+            </article>
+            {{end}}
+        {{else}}
+            <div class="empty-state">
+                <p>No functional blueprints match this target view filter criteria yet.</p>
+            </div>
+        {{end}}
+        </div>
+    </section>
+    <aside class="right-sidebar"><section class="sidebar-card"><h2>Community</h2><p>A place for registered and guest members alike to post, comment and vote on discussions across every category.</p></section><section class="sidebar-card"><h2>Community Rules</h2><p>Be respectful. No spam. Keep posts in the right category.</p></section></aside>
+</main>
+{{end}}
