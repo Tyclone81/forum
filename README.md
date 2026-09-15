@@ -1,4 +1,4 @@
-# ViableForum
+# Forum
 
 ViableForum is a server-rendered web forum built with Go, SQLite, HTML, CSS, and vanilla JavaScript. Users can register, sign in, publish categorized posts, discuss posts through comments, react to posts and comments, and filter the forum feed.
 
