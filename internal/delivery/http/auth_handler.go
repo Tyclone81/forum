@@ -44,6 +44,7 @@ func RegisterHandler(c *HandlerContainer) http.HandlerFunc {
 func LoginHandler(c *HandlerContainer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
+			w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 			http.ServeFile(w, r, "./ui/templates/login.html")
 			return
 		}
