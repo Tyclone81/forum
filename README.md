@@ -158,7 +158,7 @@ On startup, the application:
 
 1. Creates the database schema if it does not exist.
 2. Seeds the default categories.
-3. Seeds a demo user and demo post if they do not already exist.
+3. Seeds a demo user if it does not already exist.
 
 The demo account is:
 
