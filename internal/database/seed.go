@@ -38,7 +38,7 @@ func SeedCategories(ctx context.Context, db *sql.DB) error {
 	return tx.Commit()
 }
 
-// SeedMockData populates initial test data to make the project instantly testable without manual intervention.
+// SeedMockData populates the demo account to make the project instantly testable without manual intervention.
 func SeedMockData(ctx context.Context, db *sql.DB) error {
 	// 1. Inject an evaluation mock tester account
 	// Password representation is pre-hashed with Bcrypt for the sequence ("password123")
@@ -52,23 +52,14 @@ func SeedMockData(ctx context.Context, db *sql.DB) error {
 		return fmt.Errorf("failed to seed mock structural user: %w", err)
 	}
 
-	// 2. Inject an initial post thread detailing our architectural mindset
-	postQuery := `INSERT OR IGNORE INTO posts (id, user_id, title, content, created_at) 
-	              VALUES (?, ?, ?, ?, ?);`
 	mockPostID := "00000000-0000-4000-a000-000000000002"
-
-	_, err = db.ExecContext(ctx, postQuery, mockPostID, mockUserID, "The Leap to Architect", "Stop writing strings blindly. Own your blueprint and build viable software configurations natively.", time.Now())
-	if err != nil {
-		return fmt.Errorf("failed to seed structural mock post: %w", err)
+	if _, err = db.ExecContext(ctx, `DELETE FROM interactions WHERE target_id = ? AND target_type = 'post'`, mockPostID); err != nil {
+		return fmt.Errorf("failed to remove legacy mock post interactions: %w", err)
+	}
+	if _, err = db.ExecContext(ctx, `DELETE FROM posts WHERE id = ?`, mockPostID); err != nil {
+		return fmt.Errorf("failed to remove legacy mock post: %w", err)
 	}
 
-	// 3. Connect the post to the 'Technology' category tag index cleanly
-	junctionQuery := `INSERT OR IGNORE INTO post_categories (post_id, category_id) 
-	                  SELECT ?, id FROM categories WHERE name = ?;`
-	_, err = db.ExecContext(ctx, junctionQuery, mockPostID, "Technology")
-	if err != nil {
-		return fmt.Errorf("failed to link structural category associations: %w", err)
-	}
-
+	// The legacy post is intentionally not recreated.
 	return nil
 }
